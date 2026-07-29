@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/api/roboflow"
+  to = "https://serverless.roboflow.com/tanvir-gzki7/workflows/finalmldataset-v2-logic"
+  status = 200
+  force = true

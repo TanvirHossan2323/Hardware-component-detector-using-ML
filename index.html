@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Component Detector | Tanvir Hossan</title>
+  
+  <!-- Favicon Warning Fix -->
+  <link rel="icon" href="data:,">
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    /* Dark Theme Variables (Default) */
+    :root {
+      --bg-color: #090d16;
+      --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b, #0f172a 70%);
+      --card-bg: rgba(30, 41, 59, 0.8);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --primary-hover: #4f46e5;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --output-bg: rgba(16, 185, 129, 0.15);
+      --output-border: rgba(16, 185, 129, 0.4);
+      --skeleton-start: rgba(255, 255, 255, 0.05);
+      --skeleton-end: rgba(99, 102, 241, 0.2);
+    }
+
+    /* Light Theme Variables */
+    [data-theme="light"] {
+      --bg-color: #f1f5f9;
+      --bg-gradient: radial-gradient(circle at 50% -20%, #e0e7ff, #f1f5f9 70%);
+      --card-bg: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.08);
+      --primary: #4f46e5;
+      --primary-glow: rgba(79, 70, 229, 0.25);
+      --primary-hover: #4338ca;
+      --accent: #059669;
+      --accent-glow: rgba(5, 150, 105, 0.2);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --output-bg: rgba(16, 185, 129, 0.1);
+      --output-border: rgba(16, 185, 129, 0.5);
+      --skeleton-start: rgba(0, 0, 0, 0.05);
+      --skeleton-end: rgba(79, 70, 229, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-color);
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 580px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      padding: 32px 28px;
+      position: relative;
+    }
+
+    /* Top Header */
+    .engine-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary), #818cf8);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .theme-toggle-btn {
+      background: rgba(15, 23, 42, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Input Action Grid */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .input-card-btn {
+      background: rgba(15, 23, 42, 0.05);
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
+      padding: 20px 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-card-btn:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .input-card-btn i {
+      font-size: 28px;
+      color: var(--primary);
+    }
+
+    .input-card-btn span {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Image Preview Container & Skeleton Loader */
+    .viewport-card {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid var(--border-color);
+      aspect-ratio: 4/3;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    #previewImg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    #outputCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Skeleton Loader Overlay */
+    .skeleton-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        var(--skeleton-start) 0%,
+        var(--skeleton-end) 50%,
+        var(--skeleton-start) 100%
+      );
+      background-size: 200% 100%;
+      animation: skeletonPulse 1.5s infinite ease-in-out;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 3;
+    }
+
+    .skeleton-overlay .scan-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes skeletonPulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 20px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--primary-glow);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Highlighted Output Component Badge */
+    .result-badge {
+      background: var(--output-bg);
+      border: 2px solid var(--output-border);
+      color: var(--accent);
+      padding: 16px 20px;
+      border-radius: 14px;
+      margin-top: 18px;
+      font-size: 15px;
+      text-align: center;
+      display: none;
+      box-shadow: 0 0 20px var(--accent-glow);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-badge strong {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--accent);
+      display: inline-block;
+      margin-left: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Developer Footer Profile */
+    .dev-card {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dev-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dev-avatar-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .dev-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dev-avatar-wrapper:hover .dev-avatar {
+      transform: scale(1.08);
+      box-shadow: 0 0 18px var(--primary);
+    }
+
+    .dev-details h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .dev-details .title-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 2px;
+    }
+
+    .dev-details .univ-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .social-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-icon:hover {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Modal / Lightbox for Profile Image */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 20px;
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 30px var(--primary-glow);
+      object-fit: contain;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      color: #fff;
+      font-size: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <div class="engine-header">
+      <div class="brand-title">
+        <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="brand-text">
+          <h1>Component Detector</h1>
+          <p>Roboflow Workflow Engine</p>
+        </div>
+      </div>
+
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light/Dark Mode">
+        <i class="fa-solid fa-sun" id="themeIcon"></i>
+      </button>
+    </div>
+
+    <!-- Input Selection Cards -->
+    <div class="action-grid">
+      <div class="input-card-btn" onclick="document.getElementById('cameraInput').click()">
+        <i class="fa-solid fa-camera"></i>
+        <span>Take Photo</span>
+        <input type="file" id="cameraInput" accept="image/*" capture="camera" style="display: none;">
+      </div>
+
+      <div class="input-card-btn" onclick="document.getElementById('galleryInput').click()">
+        <i class="fa-solid fa-images"></i>
+        <span>Choose Gallery</span>
+        <input type="file" id="galleryInput" accept="image/*" style="display: none;">
+      </div>
+    </div>
+
+    <!-- Image Preview Viewport & Skeleton Overlay -->
+    <div class="viewport-card" id="viewportCard">
+      <img id="previewImg" alt="Selected Image">
+      <canvas id="outputCanvas"></canvas>
+
+      <div class="skeleton-overlay" id="skeletonLoader">
+        <div class="scan-text">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Scanning Component...
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <div id="processControl" style="display: none;">
+      <button class="btn-action" id="detectBtn" onclick="detectComponent()">
+        <i class="fa-solid fa-bolt"></i> Detect Component
+      </button>
+    </div>
+
+    <!-- Status Message & Result Badge -->
+    <div id="status" class="status-msg">Upload or take a photo to start detection.</div>
+    <div id="resultBadge" class="result-badge"></div>
+
+    <!-- Developer Profile Footer -->
+    <div class="dev-card">
+      <div class="dev-profile">
+        <div class="dev-avatar-wrapper" onclick="openProfileImage()" title="Click to enlarge photo">
+          <img src="tanvir.jpg" alt="Tanvir Hossan" class="dev-avatar" id="devAvatarImg" onerror="this.src='https://via.placeholder.com/150/6366f1/ffffff?text=TH'">
+        </div>
+        <div class="dev-details">
+          <h4>Tanvir Hossan</h4>
+          <p class="title-text">Flutter Developer || AI Engineer</p>
+          <p class="univ-text">United International University</p>
+        </div>
+      </div>
+      
+      <div class="social-links">
+        <a href="https://github.com/TanvirHossan2323" target="_blank" class="social-icon" title="GitHub Profile">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/tanvir-hossan-344887268/" target="_blank" class="social-icon" title="LinkedIn Profile">
+          <i class="fa-brands fa-linkedin-in"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="imageModal" class="image-modal" onclick="closeProfileImage()">
+    <span class="modal-close">&times;</span>
+    <img id="modalImg" class="modal-content" alt="Tanvir Hossan Profile Picture">
+  </div>
+
+  <script>
+    // 🟢 Cloudflare Worker URL (CORS Proxy ছাড়াই সরাসরি কানেক্টেড)
+    const WORKER_URL = "/api/roboflow";
+    const API_KEY = "TmACDVtA0YOIEHp9x3hL";
+
+    const previewImg = document.getElementById('previewImg');
+    const viewportCard = document.getElementById('viewportCard');
+    const canvas = document.getElementById('outputCanvas');
+    const status = document.getElementById('status');
+    const resultBadge = document.getElementById('resultBadge');
+    const processControl = document.getElementById('processControl');
+    const detectBtn = document.getElementById('detectBtn');
+    const skeletonLoader = document.getElementById('skeletonLoader');
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+
+    let currentFile = null;
+
+    // Theme Switcher
+    function toggleTheme() {
+      const body = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+        themeIcon.className = 'fa-solid fa-sun';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.setAttribute('data-theme', 'light');
+        themeIcon.className = 'fa-solid fa-moon';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+    }
+
+    // Modal Image Functions
+    function openProfileImage() {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      const avatarImg = document.getElementById('devAvatarImg');
+      modalImg.src = avatarImg.src;
+      modal.style.display = 'flex';
+    }
+
+    function closeProfileImage() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+
+    // Handle Image Input
+    [cameraInput, galleryInput].forEach(input => {
+      input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          currentFile = file;
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            previewImg.src = event.target.result;
+            viewportCard.style.display = 'flex';
+            processControl.style.display = 'block';
+            clearCanvas();
+            status.innerText = "Image loaded! Click Detect Component to analyze.";
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+
+    // Sound Synthesis
+    function playSuccessChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.15, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.3);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.1);
+        gain2.gain.setValueAtTime(0.2, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.1);
+        osc2.stop(now + 0.5);
+      } catch (err) {}
+    }
+
+    function triggerHaptic() {
+      if (navigator.vibrate) navigator.vibrate([40, 60, 80]);
+    }
+
+    // Main Detect Function
+    async function detectComponent() {
+      if (!currentFile) {
+        alert("Please select or capture an image first!");
+        return;
+      }
+
+      skeletonLoader.style.display = 'flex';
+      detectBtn.disabled = true;
+      status.innerText = "⚡ Analyzing component with AI...";
+      resultBadge.style.display = 'none';
+
+      try {
+        const base64Image = await getBase64(currentFile);
+        
+        canvas.width = previewImg.clientWidth;
+        canvas.height = previewImg.clientHeight;
+
+        // Directly posting to your Cloudflare Worker Gateway
+        const response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                api_key: API_KEY,
+                inputs: { "image": { "type": "base64", "value": base64Image } }
+            })
+        });
+
+        if (!response.ok) {
+           throw new Error(`Server status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("Roboflow Response Data:", result);
+        
+        skeletonLoader.style.display = 'none';
+        detectBtn.disabled = false;
+        status.innerText = "✅ Analysis Complete!";
+        
+        // Response parsing logic
+        let predictions = [];
+        if (result.outputs && Array.isArray(result.outputs)) {
+           const firstOutput = result.outputs[0];
+           predictions = firstOutput.predictions?.predictions || firstOutput.predictions || firstOutput.output || [];
+        } else if (result.predictions) {
+           predictions = result.predictions;
+        }
+        
+        if (predictions.length > 0) {
+          drawBoxes(predictions, previewImg.naturalWidth, previewImg.naturalHeight);
+          playSuccessChime();
+          triggerHaptic();
+
+          const detectedList = predictions.map(p => `${p.class || p.label || 'Component'} (${Math.round((p.confidence || 1) * 100)}%)`).join(', ');
+          resultBadge.innerHTML = `<i class="fa-solid fa-bullseye"></i> Detected Component: <strong>${detectedList}</strong>`;
+          resultBadge.style.display = 'block';
+        } else {
+          status.innerText = "⚠️ No component detected in this photo.";
+        }
+
+      } catch (error) {
+        console.error("Error:", error);
+        skeletonLoader.style.display = 'none';
+        detectBtn.disabled = false;
+        status.innerText = "❌ Processing error! Check worker or network connection.";
+      }
+    }
+
+    function drawBoxes(predictions, naturalW, naturalH) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const scaleX = canvas.width / naturalW;
+      const scaleY = canvas.height / naturalH;
+
+      predictions.forEach(pred => {
+        const width = (pred.width || 0) * scaleX;
+        const height = (pred.height || 0) * scaleY;
+        const x = ((pred.x || 0) * scaleX) - (width / 2);
+        const y = ((pred.y || 0) * scaleY) - (height / 2);
+        const label = pred.class || pred.label || 'Component';
+        const confidence = Math.round((pred.confidence || 1) * 100);
+
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, width, height);
+
+        ctx.fillStyle = "#10b981";
+        ctx.font = "700 13px Inter, sans-serif";
+        const labelText = `${label} ${confidence}%`;
+        const textWidth = ctx.measureText(labelText).width;
+        
+        ctx.fillRect(x, y > 24 ? y - 24 : y, textWidth + 12, 24);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(labelText, x + 6, y > 24 ? y - 7 : y + 16);
+      });
+    }
+
+    function clearCanvas() {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      resultBadge.style.display = 'none';
+      skeletonLoader.style.display = 'none';
+      detectBtn.disabled = false;
+    }
+
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+  </script>
+</body>
+</html>
